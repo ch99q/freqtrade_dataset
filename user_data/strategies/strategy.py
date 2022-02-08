@@ -96,26 +96,7 @@ class PredictionStrategy(IStrategy):
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
 
         verbose = False
-        col_use = ['volume', 'smadiff_3', 'smadiff_3_pct', 'maxdiff_3', 'maxdiff_3_pct',
- 'mindiff_3', 'mindiff_3_pct', 'std_3', 'ma_3', 'mfi_3', 'smadiff_5',
- 'smadiff_5_pct', 'maxdiff_5', 'maxdiff_5_pct', 'mindiff_5', 'mindiff_5_pct',
- 'std_5', 'ma_5', 'mfi_5', 'smadiff_8', 'smadiff_8_pct', 'maxdiff_8',
- 'maxdiff_8_pct', 'mindiff_8', 'mindiff_8_pct', 'std_8', 'ma_8', 'mfi_8',
- 'smadiff_13', 'smadiff_13_pct', 'maxdiff_13', 'maxdiff_13_pct', 'mindiff_13',
- 'mindiff_13_pct', 'std_13', 'ma_13', 'mfi_13', 'smadiff_24', 'smadiff_24_pct',
- 'maxdiff_24', 'maxdiff_24_pct', 'mindiff_24', 'mindiff_24_pct', 'std_24',
- 'ma_24', 'mfi_24', 'smadiff_34', 'smadiff_34_pct', 'maxdiff_34',
- 'maxdiff_34_pct', 'mindiff_34', 'mindiff_34_pct', 'std_34', 'ma_34', 'mfi_34',
- 'smadiff_60', 'smadiff_60_pct', 'maxdiff_60', 'maxdiff_60_pct', 'mindiff_60',
- 'mindiff_60_pct', 'std_60', 'ma_60', 'mfi_60', 'smadiff_80', 'smadiff_80_pct',
- 'maxdiff_80', 'maxdiff_80_pct', 'mindiff_80', 'mindiff_80_pct', 'std_80',
- 'ma_80', 'mfi_80', 'smadiff_120', 'smadiff_120_pct', 'maxdiff_120',
- 'maxdiff_120_pct', 'mindiff_120', 'mindiff_120_pct', 'std_120', 'ma_120',
- 'mfi_120', 'z_score_120', 'time_hourmin', 'time_dayofweek', 'time_hour', 'uo',
- 'cci', 'rsi', 'adx', 'sar', 'fisher_rsi', 'fisher_rsi_norma', 'ssl_down',
- 'ssl_up', 'ewo', 'minus_di', 'plus_di', 'linreg', 'linreg_upper',
- 'linreg_lower', 'linreg_angle', 'linreg_slope', 'fg_value',
- 'fg_value_rolling_3d', 'fg_value_rolling_7d']
+        col_use = ['volume', 'smadiff_3', 'smadiff_3_pct', 'maxdiff_3', 'maxdiff_3_pct','mindiff_3', 'mindiff_3_pct', 'std_3', 'ma_3', 'mfi_3', 'smadiff_5','smadiff_5_pct', 'maxdiff_5', 'maxdiff_5_pct', 'mindiff_5', 'mindiff_5_pct','std_5', 'ma_5', 'mfi_5', 'smadiff_8', 'smadiff_8_pct', 'maxdiff_8','maxdiff_8_pct', 'mindiff_8', 'mindiff_8_pct', 'std_8', 'ma_8', 'mfi_8','smadiff_13', 'smadiff_13_pct', 'maxdiff_13', 'maxdiff_13_pct', 'mindiff_13','mindiff_13_pct', 'std_13', 'ma_13', 'mfi_13', 'smadiff_24', 'smadiff_24_pct','maxdiff_24', 'maxdiff_24_pct', 'mindiff_24', 'mindiff_24_pct', 'std_24', 'ma_24', 'mfi_24', 'smadiff_34', 'smadiff_34_pct', 'maxdiff_34', 'maxdiff_34_pct', 'mindiff_34', 'mindiff_34_pct', 'std_34', 'ma_34', 'mfi_34', 'smadiff_60', 'smadiff_60_pct', 'maxdiff_60', 'maxdiff_60_pct', 'mindiff_60', 'mindiff_60_pct', 'std_60', 'ma_60', 'mfi_60', 'smadiff_80', 'smadiff_80_pct', 'maxdiff_80', 'maxdiff_80_pct', 'mindiff_80', 'mindiff_80_pct', 'std_80', 'ma_80', 'mfi_80', 'smadiff_120', 'smadiff_120_pct', 'maxdiff_120', 'maxdiff_120_pct', 'mindiff_120', 'mindiff_120_pct', 'std_120', 'ma_120', 'mfi_120', 'z_score_120', 'time_hourmin', 'time_dayofweek', 'time_hour', 'uo', 'cci', 'rsi', 'adx', 'sar', 'fisher_rsi', 'fisher_rsi_norma', 'ssl_down', 'ssl_up', 'ewo', 'minus_di', 'plus_di', 'linreg', 'linreg_upper', 'linreg_lower', 'linreg_angle', 'linreg_slope', 'fg_value', 'fg_value_rolling_3d', 'fg_value_rolling_7d']
 
         # Starting create features
         # sma diff
