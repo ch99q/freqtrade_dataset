@@ -1,6 +1,6 @@
 import import_ipynb
 
-from __notebook__ import PredictionStrategy
+import mynotebook
 
-class StrategyLoader(PredictionStrategy):
+class StrategyLoader(mynotebook.PredictionStrategy):
     INTERFACE_VERSION = 2
