@@ -10,6 +10,8 @@ import technical.indicators as ftt
 # Add your lib to import here
 from freqtrade.strategy import CategoricalParameter, RealParameter, DecimalParameter
 import talib.abstract as ta
+import freqtrade.vendor.qtpylib.indicators as qtpylib
+
 
 # This class is a sample. Feel free to customize it.
 # SSL Channels
@@ -87,7 +89,7 @@ class PredictionStrategy(IStrategy):
     # Open model
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
-        with open('model_1h_fgi_Acc_6c_val_05_08_v2.pkl', 'rb') as f:
+        with open('/kaggle/working/model_1h_fgi_Acc_6c_val_05_08_v1.pkl', 'rb') as f:
             model = pickle.load(f)
         self.model = model[0]
 
@@ -104,9 +106,10 @@ class PredictionStrategy(IStrategy):
             'maxdiff_240', 'std_240', 'ma_240', 'z_score_120', 'time_hourmin',
             'time_dayofweek', 'time_hour', 'uo', 'cci', 'rsi', 'adx', 'sar', 'fisher_rsi',
             'fisher_rsi_norma', 'ssl_down', 'ssl_up']
+
         # Starting create features
-        # sma diff
         for i in [3, 5, 8, 13, 21, 34, 55, 89, 120, 240]:
+        # smadiff
             dataframe[f"smadiff_{i}"] = (dataframe['close'].rolling(i).mean() - dataframe['close'])
         # max diff
             dataframe[f"maxdiff_{i}"] = (dataframe['close'].rolling(i).max() - dataframe['close'])
@@ -146,6 +149,7 @@ class PredictionStrategy(IStrategy):
         # Inverse Fisher transform on RSI normalized: values [0.0, 100.0] (https://goo.gl/2JGGoy)
         dataframe['fisher_rsi_norma'] = 50 * (dataframe['fisher_rsi'] + 1)
 
+        # SSL
         ssl_down_1h, ssl_up_1h = SSLChannels(dataframe, 12)
         dataframe['ssl_down'] = ssl_down_1h
         dataframe['ssl_up'] = ssl_up_1h
