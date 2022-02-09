@@ -10,8 +10,6 @@ import technical.indicators as ftt
 # Add your lib to import here
 from freqtrade.strategy import CategoricalParameter, RealParameter, DecimalParameter
 import talib.abstract as ta
-import freqtrade.vendor.qtpylib.indicators as qtpylib
-
 
 # This class is a sample. Feel free to customize it.
 # SSL Channels
@@ -96,32 +94,27 @@ class PredictionStrategy(IStrategy):
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
 
         verbose = False
-	col_use = [
-            'volume', 'smadiff_3', 'smadiff_5', 'smadiff_8', 'smadiff_13',
-            'smadiff_21', 'smadiff_34', 'smadiff_55', 'smadiff_89',
-            'smadiff_120', 'smadiff_240', 'maxdiff_3', 'maxdiff_5', 'maxdiff_8',
-            'maxdiff_13', 'maxdiff_21', 'maxdiff_34', 'maxdiff_55', 'maxdiff_89',
-            'maxdiff_120', 'maxdiff_240', 'std_3', 'std_5', 'std_8', 'std_13',
-            'std_21', 'std_34', 'std_55', 'std_89', 'std_120', 'std_240',
-            'ma_3', 'ma_5', 'ma_8', 'ma_13', 'ma_21', 'ma_34', 'ma_55', 'ma_89',
-            'ma_120', 'ma_240', 'z_score_120', 'time_hourmin', 'time_dayofweek', 'time_hour',
-            'uo', 'cci', 'rsi', 'adx', 'sar', 'ao', 'ha_open', 'ha_close', 'fisher_rsi', 'fisher_rsi_norma']
+        col_use = [
+            'volume', 'smadiff_3', 'maxdiff_3', 'std_3', 'ma_3', 'smadiff_5', 'maxdiff_5',
+            'std_5', 'ma_5', 'smadiff_8', 'maxdiff_8', 'std_8', 'ma_8', 'smadiff_13',
+            'maxdiff_13', 'std_13', 'ma_13', 'smadiff_21', 'maxdiff_21', 'std_21', 'ma_21',
+            'smadiff_34', 'maxdiff_34', 'std_34', 'ma_34', 'smadiff_55', 'maxdiff_55',
+            'std_55', 'ma_55', 'smadiff_89', 'maxdiff_89', 'std_89', 'ma_89',
+            'smadiff_120', 'maxdiff_120', 'std_120', 'ma_120', 'smadiff_240',
+            'maxdiff_240', 'std_240', 'ma_240', 'z_score_120', 'time_hourmin',
+            'time_dayofweek', 'time_hour', 'uo', 'cci', 'rsi', 'adx', 'sar', 'fisher_rsi',
+            'fisher_rsi_norma', 'ssl_down', 'ssl_up']
         # Starting create features
         # sma diff
         for i in [3, 5, 8, 13, 21, 34, 55, 89, 120, 240]:
             dataframe[f"smadiff_{i}"] = (dataframe['close'].rolling(i).mean() - dataframe['close'])
         # max diff
-        for i in [3, 5, 8, 13, 21, 34, 55, 89, 120, 240]:
             dataframe[f"maxdiff_{i}"] = (dataframe['close'].rolling(i).max() - dataframe['close'])
         # min diff
-        for i in [3, 5, 8, 13, 21, 34, 55, 89, 120, 240]:
             dataframe[f"maxdiff_{i}"] = (dataframe['close'].rolling(i).min() - dataframe['close'])
         # volatiliy
-        for i in [3, 5, 8, 13, 21, 34, 55, 89, 120, 240]:
             dataframe[f"std_{i}"] = dataframe['close'].rolling(i).std()
-
         # Return
-        for i in [3, 5, 8, 13, 21, 34, 55, 89, 120, 240]:
             dataframe[f"ma_{i}"] = dataframe['close'].pct_change(i).rolling(i).mean()
 
         dataframe['z_score_120'] = ((dataframe.ma_13 - dataframe.ma_13.rolling(21).mean() + 1e-9)
@@ -146,12 +139,6 @@ class PredictionStrategy(IStrategy):
 
         # SAR
         dataframe['sar'] = ta.SAR(dataframe)
-        # Awesome Oscillator
-        dataframe['ao'] = qtpylib.awesome_oscillator(dataframe)
-
-        heikinashi = qtpylib.heikinashi(dataframe)
-        dataframe["ha_open"] = heikinashi["open"]
-        dataframe["ha_close"] = heikinashi["close"]
 
         rsi = 0.1 * (dataframe['rsi'] - 50)
         dataframe['fisher_rsi'] = (np.exp(2 * rsi) - 1) / (np.exp(2 * rsi) + 1)
@@ -159,15 +146,15 @@ class PredictionStrategy(IStrategy):
         # Inverse Fisher transform on RSI normalized: values [0.0, 100.0] (https://goo.gl/2JGGoy)
         dataframe['fisher_rsi_norma'] = 50 * (dataframe['fisher_rsi'] + 1)
 
+        ssl_down_1h, ssl_up_1h = SSLChannels(dataframe, 12)
+        dataframe['ssl_down'] = ssl_down_1h
+        dataframe['ssl_up'] = ssl_up_1h
+
         # Model predictions
         preds = pd.DataFrame(self.model.predict_proba(dataframe[col_use]))
         preds.columns = [f"pred{i}" for i in range(5)]
         dataframe = dataframe.reset_index(drop=True)
         dataframe = pd.concat([dataframe, preds], axis=1)
-		
-        ssl_down_1h, ssl_up_1h = SSLChannels(dataframe, 12)
-        dataframe['ssl_down'] = ssl_down_1h
-        dataframe['ssl_up'] = ssl_up_1h
 		
         return dataframe
 
